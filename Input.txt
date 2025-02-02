@@ -6,12 +6,12 @@ LED: CRITICAL
 Wries
 
 [Instructions]
-1. Breadboard
+1. Power Supply
 2. BreadBoardConnection: PowerLine+
 3. BreadBoardConnection: PowerLine-
 4. BreadBoardConnection: Connect PowerLine+ to a1
 5. Resistor
-6. ComponentBreadConnection
+6. ResistorConnection: Connect PowerLine+ to b1
 
 [SuccessMSG] = Nice job!
 [ErrorMSG] = Try again!
