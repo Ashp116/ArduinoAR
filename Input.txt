@@ -13,6 +13,8 @@ Wries
 5. Resistor
 6. ResistorConnection: Connect PowerLine+ to b1
 
+7. END
+
 [SuccessMSG] = Nice job!
 [ErrorMSG] = Try again!
 [CriticalComponentMissing] = Please place $PART$ in camera view

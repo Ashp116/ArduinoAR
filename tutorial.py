@@ -6,7 +6,6 @@ import instruction
 from parse import parse_file
 
 data = parse_file("input.txt")
-print(data)
 
 class RoboflowWebcam:
     def __init__(self, api_url, api_key, model_id, inference_interval=1):
@@ -57,7 +56,7 @@ class RoboflowWebcam:
                     0.5,
                     (0, 255, 0), 2)
 
-    def draw_single_dot(self, col_label="a", row_label=1):
+    def draw_single_dot(self, row_label="a", col_label=1):
         if self.frame is None or "pins" not in self.bboard_positions:
             return
         x1, y1, x2, y2 = self.bboard_positions["pins"]
@@ -66,15 +65,15 @@ class RoboflowWebcam:
         col_spacing = pins_width // 10
         row_spacing = pins_height // 30
 
-        col_index = 9 - (ord(col_label.lower()) - ord("a"))
-        row_index = row_label - 1
+        row_index = ord(row_label.lower()) - ord("a")
+        col_index = col_label - 1
 
-        dot_x = x1 + col_index * col_spacing + col_spacing // 2
-        dot_y = y1 + row_index * row_spacing + row_spacing // 2 + 20  # Apply y padding
+        dot_x = x1 + row_index * col_spacing + col_spacing // 2
+        dot_y = y1 + col_index * row_spacing + row_spacing // 2 + 20  # Apply y padding
 
         cv2.circle(self.frame, (dot_x, dot_y), radius=5, color=(0, 255, 0), thickness=-1)
-        cv2.putText(self.frame, f"{col_label}{row_label}", (dot_x + 5, dot_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    (0, 255, 0), 2)
+        cv2.putText(self.frame, f"{row_label.upper()}{col_label}", (dot_x + 5, dot_y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (0, 255, 0), 2)
 
     def process_frame(self):
         ret, self.frame = self.cap.read()
@@ -112,22 +111,32 @@ class RoboflowWebcam:
 
         return self.frame
 
-    def run(self):
+    def run(self, funcs):
         frame = self.process_frame()
-        print(frame is not None)
         if frame is not None:
+            while funcs:
+                func, *args = funcs.pop(0)  # Unpack function and arguments
+                if args and args[0] is None:  # Handle cases where there's no argument
+                    func()  # Call function without arguments
+                else:
+                    func(*args)  # Call function with arguments
+
             cv2.imshow('Webcam', frame)
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     self.cap.release()
-            #     cv2.destroyAllWindows()
-            #     exit(0)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                return False
+            return True
+
+    def stop(self):
+        self.cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     webcam = RoboflowWebcam(
         api_url="https://detect.roboflow.com",
-        api_key="Qg9dfpa6K6c31GIewZ00",
+        api_key="V4t2YZYhTAbOuZcGDmha",
         model_id="lastsurvivor/2",
         inference_interval=1
     )
-    instruction = instruction.InstructionsRun(webcam, [{"BreadBoardConnection":'PowerLine+'}, {"BreadBoardConnection":'PowerLine-'}])
+    print(data.get("Instructions"))
+    instruction = instruction.InstructionsRun(webcam, data.get("Instructions"))
     instruction.run_camera_with_input()
