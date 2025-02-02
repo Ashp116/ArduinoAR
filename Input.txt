@@ -1,0 +1,20 @@
+[Requirements]
+Power Supply
+Resistor
+Breadboard: CRITICAL
+LED: CRITICAL
+Wries
+
+[Instructions]
+1. Breadboard
+2. BreadBoardConnection: PowerLine+
+3. BreadBoardConnection: PowerLine-
+4. BreadBoardConnection: Connect PowerLine+ to a1
+5. Resistor
+6. ComponentBreadConnection
+
+[SuccessMSG] = Nice job!
+[ErrorMSG] = Try again!
+[CriticalComponentMissing] = Please place $PART$ in camera view
+[EndMSG] = Great job! You have finished the tutorial
+
