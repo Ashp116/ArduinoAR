@@ -83,6 +83,7 @@ class InstructionsRun:
         self.index -= 1
 
     def current_task(self):
+        self.funcs = []
         self.describe_instruction(self.instructions[self.index])
 
     import threading

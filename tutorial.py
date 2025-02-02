@@ -56,24 +56,26 @@ class RoboflowWebcam:
                     0.5,
                     (0, 255, 0), 2)
 
-    def draw_single_dot(self, row_label="a", col_label=1):
+    def draw_single_dot(self, row_label="A", col_label=1):
         if self.frame is None or "pins" not in self.bboard_positions:
             return
+
         x1, y1, x2, y2 = self.bboard_positions["pins"]
         pins_width = x2 - x1
         pins_height = y2 - y1
-        col_spacing = pins_width // 10
-        row_spacing = pins_height // 30
 
-        row_index = ord(row_label.lower()) - ord("a")
-        col_index = col_label - 1
+        col_spacing = pins_width // 30  # Now columns define horizontal movement
+        row_spacing = pins_height // 10  # Rows define vertical movement
 
-        dot_x = x1 + row_index * col_spacing + col_spacing // 2
-        dot_y = y1 + col_index * row_spacing + row_spacing // 2 + 20  # Apply y padding
+        col_index = 30 - col_label  # Convert col number (1-30) to index
+        row_index = ord(row_label.lower()) - ord("a")  # Convert row letter (A-J) to index
+
+        dot_x = x1 + col_index * col_spacing + col_spacing // 2 + 1
+        dot_y = y1 + row_index * row_spacing + row_spacing // 2 + self.dot_padding_y  # Apply y padding
 
         cv2.circle(self.frame, (dot_x, dot_y), radius=5, color=(0, 255, 0), thickness=-1)
-        cv2.putText(self.frame, f"{row_label.upper()}{col_label}", (dot_x + 5, dot_y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 255, 0), 2)
+        cv2.putText(self.frame, f"{row_label.upper()}{col_label}", (dot_x + 3, dot_y - 3), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (0, 255, 0), 1)
 
     def process_frame(self):
         ret, self.frame = self.cap.read()
@@ -133,7 +135,7 @@ class RoboflowWebcam:
 if __name__ == "__main__":
     webcam = RoboflowWebcam(
         api_url="https://detect.roboflow.com",
-        api_key="V4t2YZYhTAbOuZcGDmha",
+        api_key="V1rro7Bh0c6fH3GVFyGg",
         model_id="lastsurvivor/2",
         inference_interval=1
     )
