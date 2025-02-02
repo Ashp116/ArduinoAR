@@ -1,5 +1,4 @@
 import threading
-from tutorial import RoboflowWebcam
 import re
 
 def split_alpha_numeric(s):
@@ -8,10 +7,23 @@ def split_alpha_numeric(s):
         return match.group(1), int(match.group(2))  # Letter and number
     return None, None  # Handle invalid input
 
+speak_lines = [
+"Grab your power supply",
+"Connect your positive wire of your power supply to the positive power line",
+"Connect your negative wire of your power supply to the negative power line",
+"Grab your resistor",
+"Connect your resistor to power line to a-20",
+"Grab your LED",
+"Connect your LED to b-23 to b-20",
+"Connect a wire to negative power line to a-23",
+"At this point you should see your LED light up!"
+]
+
 class InstructionsRun:
     index = 0
     instructions = [{"BreadBoardConnection":'PowerLine+'}, {"BreadBoardConnection":'PowerLine-'}, {'BreadBoardConnection': {'connect': ['PowerLine+', 'a1']}}]
     trigger = False
+    engine = None
 
     def __init__(self, roboflow_model, instructions):
         """
@@ -20,8 +32,10 @@ class InstructionsRun:
         Args:
             roboflow_model (RoboflowWebcam): Instance of the RoboflowWebcam class.
         """
+        self.spoke = None
+        self.isStart = False
         self.funcs = []
-        self.model: RoboflowWebcam = roboflow_model  # Store the model instance
+        self.model = roboflow_model  # Store the model instance
         self.instructions = instructions
 
     def describe_instruction(self, instruction: dict):
@@ -75,7 +89,7 @@ class InstructionsRun:
 
     def next_task(self):
         self.trigger = False
-        self.index += 1
+        self.spoke = False
         # self.describe_instruction(self.instructions[self.index])
 
     def prev_task(self):
@@ -85,35 +99,54 @@ class InstructionsRun:
     def current_task(self):
         self.funcs = []
         self.describe_instruction(self.instructions[self.index])
+        if not self.spoke:
+            self.spoke = True
+            self.engine.say(speak_lines[self.index])
+            self.engine.runAndWait()
+            self.index += 1
+            return
 
     import threading
 
     def input_listener(self):
         """Thread function to handle user input separately."""
         while True:
-            user_input = input("Next task: ")
-            print(f"User entered: {user_input}")  # Process user input here
+            if not self.isStart:
+                continue
+
+            user_input = input(speak_lines[self.index]+ "\nIs task done? (n: Next): ")
+
             if user_input == 'n':
                 self.trigger = True
             elif user_input == 'b':
                 self.prev_task()
 
-    def run_camera_with_input(self):
+    def run_camera_with_input(self, engine):
         """Runs the camera in a loop while handling input in a separate thread."""
-
+        self.engine = engine
         # Start the input listener thread
         input_thread = threading.Thread(target=self.input_listener, daemon=True)
         input_thread.start()
 
         while True:
-            if self.trigger:
-                self.next_task()
-            else:
-                self.current_task()
-
-            # Run self.model.run() in a loop
-
             if not self.model.run(self.funcs):
                 break
+            self.isStart = True
+
+            if self.trigger:
+                if self.index + 1 < len(self.instructions) - 1:
+                    self.next_task()
+                else:
+                    break
+            else:
+                self.current_task()
+        print("Great! You have finished your circuits.")
+        self.engine.say("Great! You have finished your circuits.")
+        self.engine.runAndWait()
+        print("There are no instructions available, Virtuino is shutting down.")
+        self.engine.say("There are no instructions available, Virtuino is shutting down.")
+        self.engine.runAndWait()
         self.model.stop()
+        exit(0)
+
 

@@ -1,3 +1,4 @@
 roboflow.zip
 /roboflow/
 .idea
+*.env

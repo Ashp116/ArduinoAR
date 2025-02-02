@@ -1,11 +1,24 @@
+import time
+
 import cv2
 import base64
 from inference_sdk import InferenceHTTPClient
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 import instruction
 from parse import parse_file
 
 data = parse_file("input.txt")
+
+import pyttsx3
+
+engine = pyttsx3.init()
+engine.say("Hello, Welcome to Virtuino!")
+print("Hello, Welcome to Virtuino!")
+engine.runAndWait()
+
 
 class RoboflowWebcam:
     def __init__(self, api_url, api_key, model_id, inference_interval=1):
@@ -135,10 +148,9 @@ class RoboflowWebcam:
 if __name__ == "__main__":
     webcam = RoboflowWebcam(
         api_url="https://detect.roboflow.com",
-        api_key="V1rro7Bh0c6fH3GVFyGg",
+        api_key=os.getenv("TOKEN"),
         model_id="lastsurvivor/2",
         inference_interval=1
     )
-    print(data.get("Instructions"))
     instruction = instruction.InstructionsRun(webcam, data.get("Instructions"))
-    instruction.run_camera_with_input()
+    instruction.run_camera_with_input(engine)

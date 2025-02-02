@@ -11,10 +11,10 @@ Wries
 3. BreadBoardConnection: PowerLine-
 4. Resistor
 5. ResistorConnection: Connect PowerLine+ to a20
-6. TEST
-7. LED: Connect b3 to a1
-8. BreadBoardConnection: Connect PowerLine- to a23
-9. END
+6. LED
+7. ResistorConnection: Connect b23 to b20
+8. ResistorConnection: Connect PowerLine- to a23
+9. DONE
 
 [SuccessMSG] = Nice job!
 [ErrorMSG] = Try again!
