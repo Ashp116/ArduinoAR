@@ -32,6 +32,8 @@ class RoboflowWebcam:
         self.negative_offset = 10  # Offset for negative power lines
         self.frame = None  # Store the current frame
 
+        self.cap.set(cv2.CAP_PROP_FPS, 90)
+
         if not self.cap.isOpened():
             raise RuntimeError("Error: Could not open webcam.")
 

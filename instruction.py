@@ -90,6 +90,7 @@ class InstructionsRun:
     def next_task(self):
         self.trigger = False
         self.spoke = False
+        self.index += 1
         # self.describe_instruction(self.instructions[self.index])
 
     def prev_task(self):
@@ -100,10 +101,10 @@ class InstructionsRun:
         self.funcs = []
         self.describe_instruction(self.instructions[self.index])
         if not self.spoke:
+            print(speak_lines[self.index] + "\nIs task done? (n: Next): ")
             self.spoke = True
             self.engine.say(speak_lines[self.index])
             self.engine.runAndWait()
-            self.index += 1
             return
 
     import threading
@@ -114,7 +115,9 @@ class InstructionsRun:
             if not self.isStart:
                 continue
 
-            user_input = input(speak_lines[self.index]+ "\nIs task done? (n: Next): ")
+            if not self.spoke:
+                continue
+            user_input = input("")
 
             if user_input == 'n':
                 self.trigger = True
@@ -141,7 +144,7 @@ class InstructionsRun:
             else:
                 self.current_task()
         print("Great! You have finished your circuits.")
-        self.engine.say("Great! You have finished your circuits.")
+        self.engine.say("Great! You have finished your circuit.")
         self.engine.runAndWait()
         print("There are no instructions available, Virtuino is shutting down.")
         self.engine.say("There are no instructions available, Virtuino is shutting down.")
