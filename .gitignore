@@ -2,3 +2,7 @@ roboflow.zip
 /roboflow/
 .idea
 *.env
+test.py
+/model/
+test.jpg
+/roboflowdataset/
